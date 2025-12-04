@@ -22,7 +22,7 @@ async-channel = "2.3.1"
 log = "0.4.27"
 bs58 = { version = "0.5.1" }
 wasm-bindgen-futures = "0.4.50"
-web-sys = { version = "0.3.77", features = [
+web-sys = { version = "0.3.92", features = [
     "Window",
     "Document",
     "Event",

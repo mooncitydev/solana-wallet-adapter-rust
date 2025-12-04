@@ -35,24 +35,34 @@ impl<'a> InitEvents<'a> {
     pub fn init(&self, adapter: &mut WalletAdapter) -> WalletResult<()> {
         let storage = adapter.storage();
         self.register_wallet_event(storage.clone_inner())?;
-        self.dispatch_app_event(storage.clone_inner());
+        self.dispatch_app_event(storage.clone_inner())?;
 
         Ok(())
     }
 
     /// An App Ready event registered to the browser window
-    pub fn dispatch_app_event(&self, storage: StorageType) {
+    pub fn dispatch_app_event(&self, storage: StorageType) -> WalletResult<()> {
         let app_ready_init = CustomEventInit::new();
         app_ready_init.set_bubbles(false);
         app_ready_init.set_cancelable(false);
         app_ready_init.set_composed(false);
         app_ready_init.set_detail(&Self::register_object(storage));
 
-        let app_ready_ev =
-            CustomEvent::new_with_event_init_dict(WINDOW_APP_READY_EVENT_TYPE, &app_ready_init)
-                .unwrap();
+        let app_ready_ev = CustomEvent::new_with_event_init_dict(
+            WINDOW_APP_READY_EVENT_TYPE,
+            &app_ready_init,
+        )
+        .map_err(|e| WalletError::InternalError(format!(
+            "Failed to create app ready event: {:?}",
+            e
+        )))?;
 
-        self.window.dispatch_event(&app_ready_ev).unwrap();
+        self.window
+            .dispatch_event(&app_ready_ev)
+            .map_err(|e| WalletError::InternalError(format!(
+                "Failed to dispatch app ready event: {:?}",
+                e
+            )))?;
     }
 
     /// The register wallet event registered to the browser window

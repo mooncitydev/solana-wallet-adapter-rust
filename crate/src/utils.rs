@@ -390,8 +390,8 @@ impl Reflection {
     /// Check the `JS typeof` from a [JsValue]
     pub fn js_typeof(value: &JsValue) -> String {
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof
-        // The `typeof` in Js should always be a string hence unwrapping
-        value.js_typeof().as_string().unwrap()
+        // The `typeof` in Js should always be a string
+        value.js_typeof().as_string().unwrap_or_else(|| "unknown".to_string())
     }
 
     /// Consume [Self](Reflection) and return it's value as a [Function]
